@@ -44,13 +44,16 @@ def _ping_connection(connection, branch):
         # attribute which specifies if this connection is a "disconnect"
         # condition, which is based on inspection of the original exception
         # by the dialect in use.
+        print('>>> matveevtam\'s fix caught an error!', err)
         if err.connection_invalidated:
+            print('>>> connection is invalidated in the error')
             # run the same SELECT again - the connection will re-validate
             # itself and establish a new connection.  The disconnect detection
             # here also causes the whole connection pool to be invalidated
             # so that all stale connections are discarded.
             connection.scalar(select([1]))
         else:
+            print('>>> connection was not invalidated, so raising')
             raise
     finally:
         # restore "close with result"
