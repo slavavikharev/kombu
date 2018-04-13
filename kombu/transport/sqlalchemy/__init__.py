@@ -104,8 +104,12 @@ class Channel(virtual.Channel):
         return self._session
 
     def _get_or_create(self, queue):
-        obj = self.session.query(self.queue_cls) \
-            .filter(self.queue_cls.name == queue).first()
+        try:
+            obj = self.session.query(self.queue_cls) \
+                .filter(self.queue_cls.name == queue).first()
+        except DBAPIError:
+            self.session.rollback()
+            raise
         if not obj:
             obj = self.queue_cls(queue)
             self.session.add(obj)
